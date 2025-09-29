@@ -6,16 +6,44 @@
   <script src="https://cdn.tailwindcss.com"></script>    
   <title>AnimeRequester</title>
 </head>
-<body>
 
-    <button id="connexion">
-        Chercher le film
-    </button>
 
-    <input type="text" id="champsTitre" placeholder="Entrez un titre de film">
-    
-    
+<body class="bg-gray-100">
 
-    <script src="script.js"></script>
-</body>
+    <form id="animeForm" class="max-w-lg mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg">
+      
+      <h2 class="text-xl font-semibold text-center mb-6">Recherche d'anime</h2>
+  
+      <div class="grid grid-cols-2 gap-4 items-center mb-4">
+        <label for="opt-select" class="font-medium text-gray-700">Type de recherche:</label>
+        <select id="opt-select" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+          <option value="">--Veuillez choisir une option--</option>
+          <option value="title">Titre</option>
+          <option value="id">Identifiant</option>
+          <option value="classement">Classement</option>
+     
+        </select>
+      </div>
+  
+      <div class="grid grid-cols-2 gap-4 items-center mb-6">
+        <label for="anime" class="font-medium text-gray-700">Paramètre:</label>
+        <input type="text" name="anime" id="champsTitre" required 
+          class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+      </div>
+  
+      <div class="flex justify-end gap-4">
+        <button type="reset" 
+          class="px-4 py-2 bg-gray-400 text-white rounded-lg shadow hover:bg-gray-500 transition">
+          Effacer
+        </button>
+        <button type="submit"  id="connexion"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">
+          Rechercher
+        </button>
+      </div>
+  
+    </form>
+      <script src="script.js"></script>
+
+  </body>
 </html>

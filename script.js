@@ -3,11 +3,16 @@ const key = '23581e0e60mshf94250b663de525p1cd632jsn7bbe7b3e4a81';
 const host = 'anime-db.p.rapidapi.com';
 
 
+var par = document.getElementById("opt-select").options[document.getElementById('liste').selectedIndex].text;
+
 const connexionBtn = document.getElementById('connexion');
 
 connexionBtn.addEventListener("click",()=>{
+    event.preventDefault();
     console.log("Btn connexion")
-    SearchTitle();
+    console.log(par);
+    
+   // SearchTitle();
 })
 
 
