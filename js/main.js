@@ -1,4 +1,4 @@
-import { searchTitle, searchId, searchClass } from "./api.js";
+import { searchTitle, searchId, searchClass, getKey } from "./api.js";
 import {
   afficherResultat,
   afficherResultatIdorClass,
@@ -56,3 +56,6 @@ connexionBtn.addEventListener("click", async () => {
     alert("veuillez entrer le type de recherche !");
   }
 });
+
+
+getKey();
