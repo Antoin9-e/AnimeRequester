@@ -3,9 +3,28 @@ import {
   afficherResultat,
   afficherResultatIdorClass,
   clearResult,
+  switchModeCss,
 } from "./affichage.js";
 const clearBtn = document.getElementById("clear");
 const connexionBtn = document.getElementById("connexion");
+
+const switchBtn = document.getElementById("switchMode");
+let clicked = false;
+
+switchBtn.addEventListener("click",() => {
+  if(clicked){
+    sessionStorage.setItem("mode","light");
+    console.log("light mode");
+    switchModeCss();
+    clicked = false;
+  }else{
+    sessionStorage.setItem("mode","dark");
+    console.log("dark mode");
+    switchModeCss();
+    clicked = true;
+  }
+  
+})
 
 clearBtn.addEventListener("click", () => {
   console.log("clear");

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light:bg-white dark:bg-dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <title>AnimeRequester</title>
+    <link rel="stylesheet" href="style.css">
   </head>
 
-  <body class="bg-gray-100">
+  <body class="bg-gray-100" id="body">
+    
     <form
       id="animeForm"
       class="max-w-lg mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg"
@@ -15,12 +17,12 @@
       <h2 class="text-xl font-semibold text-center mb-6">Recherche d'anime</h2>
 
       <div class="grid grid-cols-2 gap-4 items-center mb-4">
-        <label for="opt-select" class="font-medium text-gray-700"
+        <label for="opt-select" class="font-medium text-gray-700" id="label"
           >Type de recherche:</label
         >
         <select
           id="opt-select"
-          class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none box"
         >
           <option value="">--Veuillez choisir une option--</option>
           <option value="title">Titre</option>
@@ -30,17 +32,22 @@
       </div>
 
       <div class="grid grid-cols-2 gap-4 items-center mb-6">
-        <label for="anime" class="font-medium text-gray-700">Paramètre:</label>
+        <label for="anime" class="font-medium text-gray-700" id="label">Paramètre:</label>
         <input
           type="text"
           name="anime"
           id="champsTitre"
           required
-          class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none box"
         />
       </div>
 
       <div class="flex justify-end gap-4">
+        <label class="switch mr-12 md:mr-48 mb-5 ">
+          <input type="checkbox" id="switchMode">
+          <img src="asset/sun.svg" alt="" class="img hover:scale-110">
+          <img src="asset/moon.svg" class="hidden img hover:scale-110">
+        </label>
         <button
           type="reset"
           id="clear"

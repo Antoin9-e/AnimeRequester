@@ -86,3 +86,74 @@ export function clearResult() {
 
   resultDiv.className += " hidden";
 }
+
+export function switchModeCss(){
+  const body = document.getElementById("body");
+  let resultDiv = document.getElementById("result");
+  let formDiv = document.getElementById("animeForm");
+  let box = document.querySelectorAll(".box");
+  let img = document.querySelectorAll(".img");
+
+  let label = document.querySelectorAll("label");
+  console.log(label);
+
+  let color = sessionStorage.getItem("mode");
+  if(color == "dark"){
+    resultDiv.classList.add('bg-gray-700');
+    resultDiv.classList.add('text-white');
+
+    formDiv.classList.add('bg-gray-700');
+    formDiv.classList.add('text-white');
+
+    label.forEach((e)=>{
+      e.classList.add('text-white');
+      e.classList.remove('text-gray-700');
+
+    })
+
+    box.forEach((e)=>{
+      e.classList.add("bg-gray-900");
+      e.classList.remove("border-gray-300");
+    })
+
+    img.forEach((e)=>{
+      e.classList.toggle("hidden");
+    })
+
+    body.classList.add('bg-gray-800');
+    body.classList.remove('bg-gray-100');
+    console.log(color);
+
+  }
+
+  if(color == "light"){
+
+    //Affichage Résultat en light
+    resultDiv.classList.remove('bg-gray-700');
+    resultDiv.classList.remove('text-white');
+
+    //Affichage formulaire en light
+    formDiv.classList.remove('bg-gray-700');
+    formDiv.classList.remove('text-white');
+
+    label.forEach((e)=>{
+      e.classList.remove('text-white');
+      e.classList.add('text-gray-700');
+
+    })
+    img.forEach((e)=>{
+      e.classList.toggle("hidden");
+    })
+
+    box.forEach((e)=>{
+      e.classList.remove("bg-gray-900");
+      e.classList.add("border-gray-300");
+    })
+   
+
+    //Affichage body en light
+    body.classList.add('bg-gray-100');
+    body.classList.remove('bg-gray-800');
+
+  }
+}
