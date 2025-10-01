@@ -29,6 +29,7 @@ async function fetchData(url) {
     const response = await fetch(url, options);
     return await response.json();
   } catch (error) {
+    alert('Erreur de requete' + error);
     console.error("Erreur API:", error);
     throw error;
   }
