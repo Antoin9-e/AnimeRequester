@@ -1,12 +1,10 @@
 export function afficherResultat(result) {
   clearResult();
 
-  console.log(result);
-
   let resultDiv = document.getElementById("result");
   resultDiv.classList.remove("hidden");
 
-  for (let i = 0; i < result.data.length; i++) {
+  result.data.forEach((anime, i) => {
     const conteneur = document.createElement("div");
     const titre = document.createElement("h2");
     const image = document.createElement("img");
@@ -14,68 +12,46 @@ export function afficherResultat(result) {
     const genre = document.createElement("p");
     const ranking = document.createElement("p");
     const episodes = document.createElement("p");
-    resultDiv.appendChild(conteneur);
-    titre.textContent = result.data[i].title;
+
+    // --- Remplissage JSON ---
+    titre.textContent = anime.title;
+    image.src = anime.image;
+    synopsis.innerHTML = "<strong>Synopsis :</strong> " + (anime.synopsis || "Non disponible");
+    genre.innerHTML = "<strong>Genre :</strong> " + (anime.genres?.join(", ") || "Non renseigné");
+    ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
+    episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
+
+    // --- Insertion DOM ---
     conteneur.appendChild(titre);
-    image.src = result.data[i].image;
     conteneur.appendChild(image);
-    synopsis.innerHTML =
-      "<strong>Synopsis :</strong> " + result.data[i].synopsis;
     conteneur.appendChild(synopsis);
-
-    genre.innerHTML = "<strong>Genre : </strong> " + result.data[i].genres;
     conteneur.appendChild(genre);
-    ranking.innerHTML =
-      "<strong>Classement :  </strong>" + result.data[i].ranking;
     conteneur.appendChild(ranking);
-    episodes.innerHTML =
-      " <strong> Nombre d'épisodes : </strong>" + result.data[i].episodes;
     conteneur.appendChild(episodes);
+    resultDiv.appendChild(conteneur);
 
-    conteneur.className +=
-      " flex flex-col items-center justify-center border-b-2";
-    image.className += "shadow-lg mt-5";
-    titre.className += " font-bold text-2xl mb-2 text-center text-justify";
-    episodes.className += "mb-5";
-    synopsis.className += " text-justify mt-5 mb-5 md:w-[75%] text-center";
-  }
-}
+    // --- Style ---
+    conteneur.className =
+      "bg-white shadow-lg rounded-2xl p-6 mb-6 w-full transform transition duration-500 ease-out opacity-0 translate-y-5";
+    titre.className =
+      "font-bold text-2xl mb-4 text-center text-blue-600";
+    image.className =
+      "rounded-lg shadow-md mb-4 max-w-md w-auto h-auto mx-auto object-contain";
+    synopsis.className =
+      "text-gray-700 text-justify mb-4";
+    genre.className =
+      "text-gray-600 italic mb-2";
+    ranking.className =
+      "font-semibold text-yellow-600 mb-2";
+    episodes.className =
+      "font-medium text-gray-800";
 
-export function afficherResultatIdorClass(result) {
-  clearResult();
-  console.log(result);
-
-  let resultDiv = document.getElementById("result");
-  resultDiv.classList.remove("hidden");
-
-  const conteneur = document.createElement("div");
-  const titre = document.createElement("h2");
-  const image = document.createElement("img");
-  const synopsis = document.createElement("p");
-  const genre = document.createElement("p");
-  const ranking = document.createElement("p");
-  const episodes = document.createElement("p");
-  resultDiv.appendChild(conteneur);
-  titre.textContent = result.title;
-  conteneur.appendChild(titre);
-  image.src = result.image;
-  conteneur.appendChild(image);
-  synopsis.innerHTML = "<strong>Synopsis :</strong> " + result.synopsis;
-  conteneur.appendChild(synopsis);
-
-  genre.innerHTML = "<strong>Genre : </strong> " + result.genres;
-  conteneur.appendChild(genre);
-  ranking.innerHTML = "<strong>Classement : </strong>" + result.ranking;
-  conteneur.appendChild(ranking);
-  episodes.innerHTML =
-    "<strong>Nombre d'épisodes :</strong> " + result.episodes;
-  conteneur.appendChild(episodes);
-
-  conteneur.className +=
-    " flex flex-col items-center justify-center border-b-2";
-  titre.className += " font-bold text-2xl mb-2 text-center text-justify";
-  episodes.className += "mb-5";
-  synopsis.className += " text-justify mt-5 mb-5 md:w-[75%]";
+    // --- Animation ---
+    setTimeout(() => {
+      conteneur.classList.remove("opacity-0", "translate-y-5");
+      conteneur.classList.add("opacity-100", "translate-y-0");
+    }, i * 150);
+  });
 }
 
 export function clearResult() {
@@ -83,8 +59,7 @@ export function clearResult() {
   while (resultDiv.firstChild) {
     resultDiv.removeChild(resultDiv.firstChild);
   }
-
-  resultDiv.className += " hidden";
+  resultDiv.classList.add("hidden");
 }
 
 export function switchModeCss(){
