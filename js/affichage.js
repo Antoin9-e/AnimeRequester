@@ -62,6 +62,8 @@ export function clearResult() {
   resultDiv.classList.add("hidden");
 }
 
+
+// Dark/Light Mode
 export function switchModeCss(){
   const body = document.getElementById("body");
   let resultDiv = document.getElementById("result");
@@ -74,9 +76,12 @@ export function switchModeCss(){
 
   let color = sessionStorage.getItem("mode");
   if(color == "dark"){
+
+    //Affichage Résultat en dark
     resultDiv.classList.add('bg-gray-700');
     resultDiv.classList.add('text-white');
-
+    
+    //Affichage formulaire en dark
     formDiv.classList.add('bg-gray-700');
     formDiv.classList.add('text-white');
 
@@ -84,8 +89,7 @@ export function switchModeCss(){
       e.classList.add('text-white');
       e.classList.remove('text-gray-700');
 
-    })
-
+    })  
     box.forEach((e)=>{
       e.classList.add("bg-gray-900");
       e.classList.remove("border-gray-300");
