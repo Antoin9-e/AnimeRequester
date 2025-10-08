@@ -4,6 +4,16 @@ export function afficherResultat(result) {
   let resultDiv = document.getElementById("result");
   resultDiv.classList.remove("hidden");
 
+  // Centrage un seul résultat
+  const isSingle = Array.isArray(result?.data) && result.data.length === 1;
+  if (isSingle) {
+    resultDiv.classList.add("grid", "grid-cols-1");
+    resultDiv.classList.remove("sm:grid-cols-2", "lg:grid-cols-3");
+  } else {
+    // Restaure la grille normale
+    resultDiv.classList.add("grid", "grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3");
+  }
+
   result.data.forEach((anime, i) => {
     const conteneur = document.createElement("div");
     const titre = document.createElement("h2");
@@ -33,6 +43,11 @@ export function afficherResultat(result) {
     // --- Style ---
     conteneur.className =
       "bg-white shadow-lg rounded-2xl p-6 mb-6 w-full transform transition duration-500 ease-out opacity-0 translate-y-5";
+    if (isSingle) {
+      conteneur.classList.remove("w-full");
+      conteneur.classList.add("max-w-2xl", "mx-auto");
+    }
+
     titre.className =
       "font-bold text-2xl mb-4 text-center text-blue-600";
     image.className =
