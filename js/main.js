@@ -1,7 +1,6 @@
 import { searchTitle, searchId, searchClass } from "./api.js";
 import {
   afficherResultat,
-  afficherResultatIdorClass,
   clearResult,
 } from "./affichage.js";
 const clearBtn = document.getElementById("clear");
@@ -25,15 +24,19 @@ connexionBtn.addEventListener("click", async () => {
   console.log(par);
 
   if (par == "Titre") {
-    const result = await searchTitle(name);
-    afficherResultat(result);
-  } else if (par == "Identifiant") {
-    const result = await searchId(name);
-    afficherResultatIdorClass(result);
-  } else if (par == "Classement") {
-    const result = await searchClass(name);
-    afficherResultatIdorClass(result);
-  } else {
-    alert("veuillez entrer le type de recherche !");
-  }
+  const result = await searchTitle(name);
+  afficherResultat({ data: result.data });
+
+} else if (par == "Identifiant") {
+  const result = await searchId(name);
+  afficherResultat({ data: [result] });
+
+} else if (par == "Classement") {
+  const result = await searchClass(name);
+  afficherResultat({ data: [result] });
+
+} else {
+  alert("veuillez entrer le type de recherche !");
+}
+
 });
