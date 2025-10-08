@@ -54,6 +54,45 @@ export function afficherResultat(result) {
   });
 }
 
+function applyCardTheme(card, mode) {
+  if (mode === "dark") {
+    card.classList.add("bg-gray-700", "text-white");
+    card.classList.remove("bg-white");
+  } else {
+    card.classList.remove("bg-gray-700", "text-white");
+    card.classList.add("bg-white");
+  }
+
+  // Titre
+  const h2 = card.querySelector("h2");
+  if (h2) {
+    if (mode === "dark") {
+      if (h2.classList.contains("text-blue-600")) {
+        h2.classList.replace("text-blue-600", "text-blue-300");
+      }
+    } else {
+      if (h2.classList.contains("text-blue-300")) {
+        h2.classList.replace("text-blue-300", "text-blue-600");
+      }
+    }
+  }
+
+  // Paragraphes (synopsis, genre, ranking, episodes)
+  card.querySelectorAll("p").forEach((p) => {
+    if (mode === "dark") {
+      if (p.classList.contains("text-gray-700")) p.classList.replace("text-gray-700", "text-gray-300");
+      if (p.classList.contains("text-gray-600")) p.classList.replace("text-gray-600", "text-gray-400");
+      if (p.classList.contains("text-gray-800")) p.classList.replace("text-gray-800", "text-gray-200");
+      if (p.classList.contains("text-yellow-600")) p.classList.replace("text-yellow-600", "text-yellow-300");
+    } else {
+      if (p.classList.contains("text-gray-300")) p.classList.replace("text-gray-300", "text-gray-700");
+      if (p.classList.contains("text-gray-400")) p.classList.replace("text-gray-400", "text-gray-600");
+      if (p.classList.contains("text-gray-200")) p.classList.replace("text-gray-200", "text-gray-800");
+      if (p.classList.contains("text-yellow-300")) p.classList.replace("text-yellow-300", "text-yellow-600");
+    }
+  });
+}
+
 export function clearResult() {
   let resultDiv = document.getElementById("result");
   while (resultDiv.firstChild) {
@@ -80,7 +119,16 @@ export function switchModeCss(){
     //Affichage Résultat en dark
     resultDiv.classList.add('bg-gray-700');
     resultDiv.classList.add('text-white');
-    
+
+    Array.from(resultDiv.children || []).forEach((child)=>{
+      child.classList.add('bg-gray-700');
+      child.classList.remove('bg-white');
+      child.classList.add('text-white');
+      child.classList.remove('text-gray-700');
+
+      applyCardTheme(child, "dark");
+    });
+
     //Affichage formulaire en dark
     formDiv.classList.add('bg-gray-700');
     formDiv.classList.add('text-white');
@@ -110,6 +158,15 @@ export function switchModeCss(){
     //Affichage Résultat en light
     resultDiv.classList.remove('bg-gray-700');
     resultDiv.classList.remove('text-white');
+
+    Array.from(resultDiv.children || []).forEach((child)=>{
+      child.classList.remove('bg-gray-700');
+      child.classList.add('bg-white');
+      child.classList.remove('text-white');
+      child.classList.add('text-gray-700');
+
+      applyCardTheme(child, "light");
+    });
 
     //Affichage formulaire en light
     formDiv.classList.remove('bg-gray-700');
