@@ -18,7 +18,10 @@ export async function searchClass(rank) {
   const url = `https://anime-db.p.rapidapi.com/anime/by-ranking/${rank}`;
   return await fetchData(url);
 }
-
+export async function getGenreList() {
+  const url = `https://anime-db.p.rapidapi.com/genre`
+  return await fetchData(url);
+}
 export async function getKey() {
 
   key = window.sessionStorage.getItem("key");

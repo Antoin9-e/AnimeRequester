@@ -1,4 +1,4 @@
-import { searchTitle, searchId, searchClass, getKey } from "./api.js";
+import { searchTitle, searchId, searchClass, getKey, getGenreList } from "./api.js";
 import {
   afficherResultat,
   clearResult,
@@ -6,10 +6,22 @@ import {
 } from "./affichage.js";
 const clearBtn = document.getElementById("clear");
 const connexionBtn = document.getElementById("connexion");
-
+const listGenre = []
 const switchBtn = document.getElementById("switchMode");
+const genreContent = document.getElementById("genreContent");
 let clicked = false;
 
+
+document.addEventListener('DOMContentLoaded',  async function() {
+  const request = await getGenreList();
+
+  for(let i = 0 ; i < request.length ; i++){
+    listGenre.push(request[i]._id);
+    
+  }
+
+  console.log(listGenre);
+})
 switchBtn.addEventListener("click",() => {
   if(clicked){
     sessionStorage.setItem("mode","light");
@@ -54,7 +66,10 @@ connexionBtn.addEventListener("click", async () => {
   const result = await searchClass(name);
   afficherResultat({ data: [result] });
 
-} else {
+} else if (par == "Genre"){
+  genreContent.innerHTML = listGenre;
+
+}else {
   alert("veuillez entrer le type de recherche !");
 }
 
@@ -62,3 +77,4 @@ connexionBtn.addEventListener("click", async () => {
 
 
 getKey();
+
