@@ -4,9 +4,14 @@ export function afficherResultat(result) {
   let resultDiv = document.getElementById("result");
   resultDiv.classList.remove("hidden");
 
-  // Centrage un seul résultat
+  // Centrage
   const isSingle = Array.isArray(result?.data) && result.data.length === 1;
-  if (isSingle) {
+  const isTwo = Array.isArray(result?.data) && result.data.length === 2;
+  if (isTwo) {
+    resultDiv.classList.add("grid", "grid-cols-2");
+    resultDiv.classList.remove("sm:grid-cols-2", "lg:grid-cols-3");
+  }
+  else if (isSingle) {
     resultDiv.classList.add("grid", "grid-cols-1");
     resultDiv.classList.remove("sm:grid-cols-2", "lg:grid-cols-3");
   } else {
