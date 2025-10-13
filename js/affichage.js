@@ -38,22 +38,40 @@ export async function afficherResultat(result) {
     ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
     episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
 
-    // Lien "Voir l'anime"
-    btnVoir.target = "_blank";
+     btnVoir.target = "_blank";
     btnVoir.rel = "noopener noreferrer";
+    btnVoir.setAttribute("aria-busy", "true");
+    btnVoir.setAttribute("aria-disabled", "true");
+    btnVoir.className = "inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-400 text-white cursor-wait opacity-80 pointer-events-none transition";
+
+    // Spinner + label
+    const spinner = document.createElement("span");
+    spinner.className = "inline-block h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin";
+    const label = document.createElement("span");
+    label.textContent = "Chargement...";
+    btnVoir.appendChild(spinner);
+    btnVoir.appendChild(label);
 
     // Lien par défaut immédiat (fallback JustWatch)
     const fallback = `https://www.justwatch.com/fr/recherche?q=${encodeURIComponent(String(anime?.title || "").trim().replace(/\s+/g, "-"))}`;
     btnVoir.href = fallback;
-    btnVoir.textContent = "Voir l’anime (chargement...)";
 
-    // Mise à jour asynchrone quand le lien réel est prêt
+    // Mise à jour asynchrone quand le lien réel est prêt (ne bloque pas l'affichage)
     buildWatchLink(anime)
       .then((url) => {
         if (url) btnVoir.href = url;
       })
       .finally(() => {
-        btnVoir.textContent = "Voir l’anime";
+        // Etat prêt: styles actifs
+        btnVoir.classList.remove("bg-gray-400", "cursor-wait", "opacity-80", "pointer-events-none");
+        btnVoir.classList.add(
+          "bg-blue-600", "hover:bg-blue-700", "cursor-pointer", "opacity-100", "pointer-events-auto",
+          "focus:outline-none", "focus:ring-2", "focus:ring-blue-400"
+        );
+        btnVoir.removeAttribute("aria-busy");
+        btnVoir.setAttribute("aria-disabled", "false");
+        spinner.remove();
+        label.textContent = "Voir l’anime";
       });
 
     // --- Insertion DOM ---
