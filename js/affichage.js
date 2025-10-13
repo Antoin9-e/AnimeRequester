@@ -100,20 +100,41 @@ export async function afficherResultat(result) {
 
 // Construit un lien de visionnage (Voiranime ou JustWatch) basé sur le titre
 async function buildWatchLink(anime) {
+  console.log(anime);
   const title = (anime?.title || "").trim('-').replace(/\s+/g, "-");
+  const altTitle = (anime?.alternativeTitles?.[0] || "").trim('-').replace(/\s+/g, "-");
+
   const q = encodeURIComponent(title);
+  const qAlt = encodeURIComponent(altTitle);
 
-
-  const voiranime = `https://v6.voiranime.com/anime/${q}`;
+  const voiranime = `https://www.voiranime.com/anime/${q}`;
+  const voiranimeAlt = `https://www.voiranime.com/anime/${qAlt}`;
   const justwatch = `https://www.justwatch.com/fr/recherche?q=${q}`;
 
   // Vérif via proxy de lecture (contourne CORS) pour estimer s’il y a des résultats
   try {
     const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${q}`);
     if (probe.ok) {
+      console.log("________________________________");
+      console.log("title:", title);
       const text = await probe.text();
+      const urlSource = text.match(/URL\s*Source:\s*(https?:\/\/[^\s"'<>]+)/i);
+      console.log(urlSource[1]);
       // Heuristique simple: si pas de “404”
-      if (!/404: Not Found/i.test(text)) return voiranime;
+      if (!/404: Not Found/i.test(text)) return urlSource[1];
+    }
+  } catch (_) {
+    // ignore
+  }
+
+  try {
+    const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${qAlt}`);
+    if (probe.ok) {
+      const text = await probe.text();
+      const urlSource = text.match(/URL\s*Source:\s*(https?:\/\/[^\s"'<>]+)/i);
+      console.log(urlSource[1]);
+      // Heuristique simple: si pas de “404”
+      if (!/404: Not Found/i.test(text)) return urlSource[1];
     }
   } catch (_) {
     // ignore
