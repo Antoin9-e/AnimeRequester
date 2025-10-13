@@ -24,7 +24,7 @@
           id="opt-select"
           class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none box"
         >
-          <option value="">--Veuillez choisir une option--</option>
+          <option id="defaultOption" value="">--Veuillez choisir une option--</option>
           <option value="title">Titre</option>
           <option value="id">Identifiant</option>
           <option value="classement">Classement</option>
@@ -33,10 +33,13 @@
       </div>
 
       
-
+      <!-- Container for the genre multi-select dropdown -->
+      <div id="genreWrapper" class="grid grid-cols-2 gap-4 items-center mb-4 hidden">
+        <label class="font-medium text-gray-700">Genres:</label>
+        <div id="genreContent"></div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 items-center mb-6">
+      <div id="paramWrapper" class="grid grid-cols-2 gap-4 items-center mb-6 hidden">
         <label for="anime" class="font-medium text-gray-700" id="label">Paramètre:</label>
         <input
           type="text"

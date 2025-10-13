@@ -8,7 +8,12 @@ export async function searchTitle(name) {
   const url = `https://anime-db.p.rapidapi.com/anime?page=1&size=10&search=${name}`;
   return await fetchData(url);
 }
-
+export async function searchGenre(genres) {
+  const genreParam = genres.map(g => encodeURIComponent(g)).join('%2C');
+  console.log('Searching genres with param:', genreParam);
+  const url = `https://anime-db.p.rapidapi.com/anime?genres=${genreParam}&page=1&size=10`;
+  return await fetchData(url);
+}
 export async function searchId(id) {
   const url = `https://anime-db.p.rapidapi.com/anime/by-id/${id}`;
   return await fetchData(url);
