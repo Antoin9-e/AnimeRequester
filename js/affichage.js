@@ -1,4 +1,4 @@
-export function afficherResultat(result) {
+export async function afficherResultat(result) {
   clearResult();
 
   let resultDiv = document.getElementById("result");
@@ -19,7 +19,7 @@ export function afficherResultat(result) {
     resultDiv.classList.add("grid", "grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3");
   }
 
-  result.data.forEach((anime, i) => {
+  for (const [i, anime] of result.data.entries()) {
     const conteneur = document.createElement("div");
     const titre = document.createElement("h2");
     const image = document.createElement("img");
@@ -27,6 +27,8 @@ export function afficherResultat(result) {
     const genre = document.createElement("p");
     const ranking = document.createElement("p");
     const episodes = document.createElement("p");
+    const btnVoir = document.createElement("a");
+
 
     // --- Remplissage JSON ---
     titre.textContent = anime.title;
@@ -36,6 +38,24 @@ export function afficherResultat(result) {
     ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
     episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
 
+    // Lien "Voir l'anime"
+    btnVoir.target = "_blank";
+    btnVoir.rel = "noopener noreferrer";
+
+    // Lien par défaut immédiat (fallback JustWatch)
+    const fallback = `https://www.justwatch.com/fr/recherche?q=${encodeURIComponent(String(anime?.title || "").trim().replace(/\s+/g, "-"))}`;
+    btnVoir.href = fallback;
+    btnVoir.textContent = "Voir l’anime (chargement...)";
+
+    // Mise à jour asynchrone quand le lien réel est prêt
+    buildWatchLink(anime)
+      .then((url) => {
+        if (url) btnVoir.href = url;
+      })
+      .finally(() => {
+        btnVoir.textContent = "Voir l’anime";
+      });
+
     // --- Insertion DOM ---
     conteneur.appendChild(titre);
     conteneur.appendChild(image);
@@ -43,6 +63,7 @@ export function afficherResultat(result) {
     conteneur.appendChild(genre);
     conteneur.appendChild(ranking);
     conteneur.appendChild(episodes);
+    conteneur.appendChild(btnVoir);
     resultDiv.appendChild(conteneur);
 
     // --- Style ---
@@ -71,7 +92,34 @@ export function afficherResultat(result) {
       conteneur.classList.remove("opacity-0", "translate-y-5");
       conteneur.classList.add("opacity-100", "translate-y-0");
     }, i * 150);
-  });
+  };
+}
+
+
+
+
+// Construit un lien de visionnage (Voiranime ou JustWatch) basé sur le titre
+async function buildWatchLink(anime) {
+  const title = (anime?.title || "").trim('-').replace(/\s+/g, "-");
+  const q = encodeURIComponent(title);
+
+
+  const voiranime = `https://v6.voiranime.com/anime/${q}`;
+  const justwatch = `https://www.justwatch.com/fr/recherche?q=${q}`;
+
+  // Vérif via proxy de lecture (contourne CORS) pour estimer s’il y a des résultats
+  try {
+    const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${q}`);
+    if (probe.ok) {
+      const text = await probe.text();
+      // Heuristique simple: si pas de “404”
+      if (!/404: Not Found/i.test(text)) return voiranime;
+    }
+  } catch (_) {
+    // ignore
+  }
+
+  return justwatch;
 }
 
 function applyCardTheme(card, mode) {
