@@ -33,7 +33,46 @@ export async function afficherResultat(result) {
     // --- Remplissage JSON ---
     titre.textContent = anime.title;
     image.src = anime.image;
-    synopsis.innerHTML = "<strong>Synopsis :</strong> " + (anime.synopsis || "Non disponible");
+
+    // Synopsis avec "Voir plus / Voir moins"
+    const fullSynopsis = String(anime.synopsis || "Non disponible");
+    const { first: firstSentenceText, hasMore } = getFirstSentence(fullSynopsis);
+
+    const synoLabel = document.createElement("strong");
+    synoLabel.textContent = "Synopsis :";
+    const synoContent = document.createElement("span");
+    synoContent.className = "ml-1";
+    synoContent.textContent = firstSentenceText;
+
+    synopsis.appendChild(synoLabel);
+    synopsis.appendChild(document.createTextNode(" "));
+    synopsis.appendChild(synoContent);
+
+
+    // Bouton Voir plus / Voir moins
+    if (hasMore) {
+      const btnToggle = document.createElement("button");
+      btnToggle.type = "button";
+      btnToggle.className = "ml-2 text-blue-600 hover:underline focus:outline-none";
+      btnToggle.textContent = "Voir plus";
+
+      let expanded = false;
+      btnToggle.addEventListener("click", () => {
+        expanded = !expanded;
+        if (expanded) {
+          synoContent.textContent = fullSynopsis;
+          synoEllipsis.textContent = "";
+          btnToggle.textContent = "Voir moins";
+        } else {
+          synoContent.textContent = firstSentenceText;
+          synoEllipsis.textContent = "...";
+          btnToggle.textContent = "Voir plus";
+        }
+      });
+
+      synopsis.appendChild(btnToggle);
+    }
+
     genre.innerHTML = "<strong>Genre :</strong> " + (anime.genres?.join(", ") || "Non renseigné");
     ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
     episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
@@ -87,10 +126,6 @@ export async function afficherResultat(result) {
     // --- Style ---
     conteneur.className =
       "bg-white shadow-lg rounded-2xl p-6 mb-6 w-full transform transition duration-500 ease-out opacity-0 translate-y-5";
-    if (isSingle) {
-      conteneur.classList.remove("w-full");
-      conteneur.classList.add("max-w-2xl", "mx-auto");
-    }
 
     titre.className =
       "font-bold text-2xl mb-4 text-center text-blue-600";
@@ -129,7 +164,7 @@ async function buildWatchLink(anime) {
   const voiranimeAlt = `https://www.voiranime.com/anime/${qAlt}`;
   const justwatch = `https://www.justwatch.com/fr/recherche?q=${q}`;
 
-  // Vérif via proxy de lecture (contourne CORS) pour estimer s’il y a des résultats
+  // Vérif via proxy de lecture (contourne CORS)
   try {
     const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${q}`);
     if (probe.ok) {
@@ -144,7 +179,8 @@ async function buildWatchLink(anime) {
   } catch (_) {
     // ignore
   }
-
+  
+  // Vérif via proxy de lecture (contourne CORS)
   try {
     const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${qAlt}`);
     if (probe.ok) {
@@ -299,4 +335,37 @@ export function switchModeCss(){
     body.classList.remove('bg-gray-800');
 
   }
+}
+
+// Helper: extrait la première phrase d’un texte
+function getFirstSentence(text) {
+  const t = String(text || "").trim();
+
+  // Cherche le premier caractère de fin de phrase (. ! ? ou ponctuation JP)
+  const endIdx = findFirstSentenceEnd(t);
+  if (endIdx !== -1) {
+    const first = t.slice(0, endIdx + 1).trim();
+    return { first, hasMore: first.length < t.length };
+  }
+
+  // Pas de ponctuation -> coupe à 160 caractères max
+  const max = 160;
+  if (t.length > max) {
+    const cut = t.slice(0, max);
+    // évite de couper au milieu d’un mot si possible
+    const lastSpace = cut.lastIndexOf(" ");
+    const first = (lastSpace > 50 ? cut.slice(0, lastSpace) : cut).trim();
+    return { first, hasMore: true };
+  }
+
+  return { first: t, hasMore: false };
+}
+
+function findFirstSentenceEnd(t) {
+  // Liste des ponctuations possibles de fin de phrase
+  const endChars = [".", "!", "?", "。", "！", "？"];
+  for (let i = 0; i < t.length; i++) {
+    if (endChars.includes(t[i])) return i;
+  }
+  return -1;
 }
