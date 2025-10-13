@@ -1,4 +1,4 @@
-export function afficherResultat(result) {
+export async function afficherResultat(result) {
   clearResult();
 
   let resultDiv = document.getElementById("result");
@@ -19,7 +19,7 @@ export function afficherResultat(result) {
     resultDiv.classList.add("grid", "grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3");
   }
 
-  result.data.forEach((anime, i) => {
+  for (const [i, anime] of result.data.entries()) {
     const conteneur = document.createElement("div");
     const titre = document.createElement("h2");
     const image = document.createElement("img");
@@ -27,14 +27,91 @@ export function afficherResultat(result) {
     const genre = document.createElement("p");
     const ranking = document.createElement("p");
     const episodes = document.createElement("p");
+    const btnVoir = document.createElement("a");
+
 
     // --- Remplissage JSON ---
     titre.textContent = anime.title;
     image.src = anime.image;
-    synopsis.innerHTML = "<strong>Synopsis :</strong> " + (anime.synopsis || "Non disponible");
+
+    // Synopsis avec "Voir plus / Voir moins"
+    const fullSynopsis = String(anime.synopsis || "Non disponible");
+    const { first: firstSentenceText, hasMore } = getFirstSentence(fullSynopsis);
+
+    const synoLabel = document.createElement("strong");
+    synoLabel.textContent = "Synopsis :";
+    const synoContent = document.createElement("span");
+    synoContent.className = "ml-1";
+    synoContent.textContent = firstSentenceText;
+
+    synopsis.appendChild(synoLabel);
+    synopsis.appendChild(document.createTextNode(" "));
+    synopsis.appendChild(synoContent);
+
+
+    // Bouton Voir plus / Voir moins
+    if (hasMore) {
+      const btnToggle = document.createElement("button");
+      btnToggle.type = "button";
+      btnToggle.className = "ml-2 text-blue-600 hover:underline focus:outline-none";
+      btnToggle.textContent = "Voir plus";
+
+      let expanded = false;
+      btnToggle.addEventListener("click", () => {
+        expanded = !expanded;
+        if (expanded) {
+          synoContent.textContent = fullSynopsis;
+          synoEllipsis.textContent = "";
+          btnToggle.textContent = "Voir moins";
+        } else {
+          synoContent.textContent = firstSentenceText;
+          synoEllipsis.textContent = "...";
+          btnToggle.textContent = "Voir plus";
+        }
+      });
+
+      synopsis.appendChild(btnToggle);
+    }
+
     genre.innerHTML = "<strong>Genre :</strong> " + (anime.genres?.join(", ") || "Non renseigné");
     ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
     episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
+
+     btnVoir.target = "_blank";
+    btnVoir.rel = "noopener noreferrer";
+    btnVoir.setAttribute("aria-busy", "true");
+    btnVoir.setAttribute("aria-disabled", "true");
+    btnVoir.className = "inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-400 text-white cursor-wait opacity-80 pointer-events-none transition";
+
+    // Spinner + label
+    const spinner = document.createElement("span");
+    spinner.className = "inline-block h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin";
+    const label = document.createElement("span");
+    label.textContent = "Chargement...";
+    btnVoir.appendChild(spinner);
+    btnVoir.appendChild(label);
+
+    // Lien par défaut immédiat (fallback JustWatch)
+    const fallback = `https://www.justwatch.com/fr/recherche?q=${encodeURIComponent(String(anime?.title || "").trim().replace(/\s+/g, "-"))}`;
+    btnVoir.href = fallback;
+
+    // Mise à jour asynchrone quand le lien réel est prêt (ne bloque pas l'affichage)
+    buildWatchLink(anime)
+      .then((url) => {
+        if (url) btnVoir.href = url;
+      })
+      .finally(() => {
+        // Etat prêt: styles actifs
+        btnVoir.classList.remove("bg-gray-400", "cursor-wait", "opacity-80", "pointer-events-none");
+        btnVoir.classList.add(
+          "bg-blue-600", "hover:bg-blue-700", "cursor-pointer", "opacity-100", "pointer-events-auto",
+          "focus:outline-none", "focus:ring-2", "focus:ring-blue-400"
+        );
+        btnVoir.removeAttribute("aria-busy");
+        btnVoir.setAttribute("aria-disabled", "false");
+        spinner.remove();
+        label.textContent = "Voir l’anime";
+      });
 
     // --- Insertion DOM ---
     conteneur.appendChild(titre);
@@ -43,15 +120,12 @@ export function afficherResultat(result) {
     conteneur.appendChild(genre);
     conteneur.appendChild(ranking);
     conteneur.appendChild(episodes);
+    conteneur.appendChild(btnVoir);
     resultDiv.appendChild(conteneur);
 
     // --- Style ---
     conteneur.className =
       "bg-white shadow-lg rounded-2xl p-6 mb-6 w-full transform transition duration-500 ease-out opacity-0 translate-y-5";
-    if (isSingle) {
-      conteneur.classList.remove("w-full");
-      conteneur.classList.add("max-w-2xl", "mx-auto");
-    }
 
     titre.className =
       "font-bold text-2xl mb-4 text-center text-blue-600";
@@ -71,7 +145,56 @@ export function afficherResultat(result) {
       conteneur.classList.remove("opacity-0", "translate-y-5");
       conteneur.classList.add("opacity-100", "translate-y-0");
     }, i * 150);
-  });
+  };
+}
+
+
+
+
+// Construit un lien de visionnage (Voiranime ou JustWatch) basé sur le titre
+async function buildWatchLink(anime) {
+  console.log(anime);
+  const title = (anime?.title || "").trim('-').replace(/\s+/g, "-");
+  const altTitle = (anime?.alternativeTitles?.[0] || "").trim('-').replace(/\s+/g, "-");
+
+  const q = encodeURIComponent(title);
+  const qAlt = encodeURIComponent(altTitle);
+
+  const voiranime = `https://www.voiranime.com/anime/${q}`;
+  const voiranimeAlt = `https://www.voiranime.com/anime/${qAlt}`;
+  const justwatch = `https://www.justwatch.com/fr/recherche?q=${q}`;
+
+  // Vérif via proxy de lecture (contourne CORS)
+  try {
+    const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${q}`);
+    if (probe.ok) {
+      console.log("________________________________");
+      console.log("title:", title);
+      const text = await probe.text();
+      const urlSource = text.match(/URL\s*Source:\s*(https?:\/\/[^\s"'<>]+)/i);
+      console.log(urlSource[1]);
+      // Heuristique simple: si pas de “404”
+      if (!/404: Not Found/i.test(text)) return urlSource[1];
+    }
+  } catch (_) {
+    // ignore
+  }
+  
+  // Vérif via proxy de lecture (contourne CORS)
+  try {
+    const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${qAlt}`);
+    if (probe.ok) {
+      const text = await probe.text();
+      const urlSource = text.match(/URL\s*Source:\s*(https?:\/\/[^\s"'<>]+)/i);
+      console.log(urlSource[1]);
+      // Heuristique simple: si pas de “404”
+      if (!/404: Not Found/i.test(text)) return urlSource[1];
+    }
+  } catch (_) {
+    // ignore
+  }
+
+  return justwatch;
 }
 
 function applyCardTheme(card, mode) {
@@ -212,4 +335,37 @@ export function switchModeCss(){
     body.classList.remove('bg-gray-800');
 
   }
+}
+
+// Helper: extrait la première phrase d’un texte
+function getFirstSentence(text) {
+  const t = String(text || "").trim();
+
+  // Cherche le premier caractère de fin de phrase (. ! ? ou ponctuation JP)
+  const endIdx = findFirstSentenceEnd(t);
+  if (endIdx !== -1) {
+    const first = t.slice(0, endIdx + 1).trim();
+    return { first, hasMore: first.length < t.length };
+  }
+
+  // Pas de ponctuation -> coupe à 160 caractères max
+  const max = 160;
+  if (t.length > max) {
+    const cut = t.slice(0, max);
+    // évite de couper au milieu d’un mot si possible
+    const lastSpace = cut.lastIndexOf(" ");
+    const first = (lastSpace > 50 ? cut.slice(0, lastSpace) : cut).trim();
+    return { first, hasMore: true };
+  }
+
+  return { first: t, hasMore: false };
+}
+
+function findFirstSentenceEnd(t) {
+  // Liste des ponctuations possibles de fin de phrase
+  const endChars = [".", "!", "?", "。", "！", "？"];
+  for (let i = 0; i < t.length; i++) {
+    if (endChars.includes(t[i])) return i;
+  }
+  return -1;
 }
