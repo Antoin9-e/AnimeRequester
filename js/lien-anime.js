@@ -1,5 +1,3 @@
-// Fonctions liées à la construction du lien "Voir l'anime"
-
 /**
  * Construit un lien de visionnage basé sur le titre: 
  * - Essaie d'extraire une "URL Source" depuis la page probe (si présente)
@@ -30,7 +28,6 @@ export async function buildWatchLink(anime) {
     // ignore
   }
 
-  // Essai avec le premier titre alternatif, si présent
   if (altTitle) {
     try {
       const probe = await fetch(`https://r.jina.ai/https://v6.voiranime.com/anime/${qAlt}`);

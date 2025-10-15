@@ -151,10 +151,6 @@ export async function afficherResultat(result) {
 }
 
 
-
-
-// buildWatchLink a été déplacé dans lien-anime.js
-
 function applyCardTheme(card, mode) {
   if (mode === "dark") {
     card.classList.add("bg-gray-700", "text-white");
@@ -210,10 +206,9 @@ export function switchModeCss(){
   let formDiv = document.getElementById("animeForm");
   let box = document.querySelectorAll(".box");
   let img = document.querySelectorAll(".img");
-
   let label = document.querySelectorAll("label");
-  console.log(label);
 
+  
   let color = sessionStorage.getItem("mode");
   if(color == "dark"){
 
@@ -250,8 +245,6 @@ export function switchModeCss(){
 
     body.classList.add('bg-gray-800');
     body.classList.remove('bg-gray-100');
-    console.log(color);
-
   }
 
   if(color == "light"){
@@ -299,7 +292,6 @@ export function switchModeCss(){
 function getFirstSentence(text) {
   const t = String(text || "").trim();
 
-  // Cherche le premier caractère de fin de phrase (. ! ? ou ponctuation JP)
   const endIdx = findFirstSentenceEnd(t);
   if (endIdx !== -1) {
     const first = t.slice(0, endIdx + 1).trim();
@@ -310,7 +302,6 @@ function getFirstSentence(text) {
   const max = 160;
   if (t.length > max) {
     const cut = t.slice(0, max);
-    // évite de couper au milieu d’un mot si possible
     const lastSpace = cut.lastIndexOf(" ");
     const first = (lastSpace > 50 ? cut.slice(0, lastSpace) : cut).trim();
     return { first, hasMore: true };

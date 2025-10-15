@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded',  async function() {
     if (paramWrapper) paramWrapper.classList.add('hidden');
     try { window.genreDropdown = genreDropdown; } catch(e) { /* ignore if modules block assignment */ }
     genreContent.addEventListener('change', (e) => {
-      console.log('Genres sélectionnés:', e.detail);
     });
   }
 })
@@ -55,12 +54,10 @@ if (optSelect) {
 switchBtn.addEventListener("click",() => {
   if(clicked){
     sessionStorage.setItem("mode","light");
-    console.log("light mode");
     switchModeCss();
     clicked = false;
   }else{
     sessionStorage.setItem("mode","dark");
-    console.log("dark mode");
     switchModeCss();
     clicked = true;
   }
@@ -68,7 +65,6 @@ switchBtn.addEventListener("click",() => {
 })
 
 clearBtn.addEventListener("click", () => {
-  console.log("clear");
   clearResult();
 });
 
@@ -81,8 +77,6 @@ connexionBtn.addEventListener("click", async () => {
     ].text;
 
   event.preventDefault();
-  console.log("Btn connexion");
-  console.log(par);
 
   if (par == "Titre") {
   const result = await searchTitle(name);
