@@ -7,8 +7,8 @@
  * - Sinon fallback JustWatch
  */
 export async function buildWatchLink(anime) {
-  const title = toDash(anime?.title || "");
-  const altTitle = toDash(anime?.alternativeTitles?.[0] || "");
+  const title = (toDash(anime?.title || "")).toLowerCase();
+  const altTitle = (toDash(anime?.alternativeTitles?.[0] || "")).toLowerCase();
 
   const q = encodeURIComponent(title);
   const qAlt = encodeURIComponent(altTitle);
@@ -16,6 +16,7 @@ export async function buildWatchLink(anime) {
   const voiranime = `https://www.voiranime.com/anime/${q}`;
   const voiranimeAlt = `https://www.voiranime.com/anime/${qAlt}`;
   const justwatch = `https://www.justwatch.com/fr/recherche?q=${q}`;
+  console.log("Build link for:", title, " / alt:", altTitle);
 
   // Vérif via proxy de lecture (contourne CORS) — peut échouer selon disponibilité
   try {
