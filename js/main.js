@@ -17,8 +17,10 @@ let genreDropdown;
 
 
 document.addEventListener('DOMContentLoaded',  async function() {
-  const request = await getGenreList();
+  
 
+  // Récupérer la liste des genres et initialiser le dropdown
+  const request = await getGenreList();
   for(let i = 0 ; i < request.length ; i++){
     listGenre.push(request[i]._id);
     
