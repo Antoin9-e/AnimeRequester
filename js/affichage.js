@@ -142,6 +142,9 @@ export async function afficherResultat(result) {
     episodes.className =
       "font-medium text-gray-800";
 
+
+    applyCardTheme(conteneur, sessionStorage.getItem("mode") || "light");
+
     // --- Animation ---
     setTimeout(() => {
       conteneur.classList.remove("opacity-0", "translate-y-5");
