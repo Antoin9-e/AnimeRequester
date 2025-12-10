@@ -2,7 +2,7 @@ const host = "anime-db.p.rapidapi.com";
 
 let key =null;
 
-const api ="23581e0e60mshf94250b663de525p1cd632jsn7bbe7b3e4a81";
+const api ="db21248c77msh191efb8d6e1c4f7p1797e5jsnab936bb4e611";
 
 export async function searchTitle(name) {
   const url = `https://anime-db.p.rapidapi.com/anime?page=1&size=10&search=${name}`;

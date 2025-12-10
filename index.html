@@ -50,12 +50,22 @@
         />
       </div>
 
-      <div class="flex justify-end gap-4">
-        <label class="switch mr-12 md:mr-48 mb-5 ">
+      <div class="flex justify-between items-center mb-4">
+        <button
+          type="button"
+          id="resetKey"
+          class="px-3 py-1 text-sm bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+        >
+          Réinitialiser la clé API
+        </button>
+        <label class="switch">
           <input type="checkbox" id="switchMode">
           <img src="asset/sun.svg"  class="img hover:scale-110">
           <img src="asset/moon.svg" class="hidden img hover:scale-110">
         </label>
+      </div>
+
+      <div class="flex justify-end gap-4">
         <button
           type="reset"
           id="clear"

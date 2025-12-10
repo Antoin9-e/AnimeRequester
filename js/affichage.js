@@ -77,7 +77,10 @@ export async function afficherResultat(result) {
 
     genre.innerHTML = "<strong>Genre :</strong> " + (anime.genres?.join(", ") || "Non renseigné");
     ranking.innerHTML = "<strong>Classement :</strong> " + (anime.ranking ?? "N/A");
-    episodes.innerHTML = "<strong>Épisodes :</strong> " + (anime.episodes ?? "Inconnu");
+    
+    // Affichage initial avec les données de l'API
+    const apiEpisodes = anime.episodes ?? "Inconnu";
+    episodes.innerHTML = "<strong>Épisodes :</strong> " + apiEpisodes;
 
      btnVoir.target = "_blank";
     btnVoir.rel = "noopener noreferrer";
@@ -99,8 +102,17 @@ export async function afficherResultat(result) {
 
     // Mise à jour asynchrone quand le lien réel est prêt (ne bloque pas l'affichage)
     buildWatchLink(anime)
-      .then((url) => {
-        if (url) btnVoir.href = url;
+      .then((result) => {
+        if (result.url) btnVoir.href = result.url;
+        
+        // Met à jour le nombre d'épisodes si disponible depuis le scraping
+        if (result.episodes !== null && result.episodes !== undefined) {
+          const scrapedEps = result.episodes;
+          const displayText = apiEpisodes !== "Inconnu" && apiEpisodes !== scrapedEps
+            ? `${apiEpisodes} (${scrapedEps} disponibles)`
+            : scrapedEps;
+          episodes.innerHTML = "<strong>Épisodes :</strong> " + displayText;
+        }
       })
       .finally(() => {
         // Etat prêt: styles actifs
@@ -112,7 +124,7 @@ export async function afficherResultat(result) {
         btnVoir.removeAttribute("aria-busy");
         btnVoir.setAttribute("aria-disabled", "false");
         spinner.remove();
-        label.textContent = "Voir l’anime";
+        label.textContent = "Voir l'anime";
       });
 
     // --- Insertion DOM ---

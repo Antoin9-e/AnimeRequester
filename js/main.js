@@ -107,6 +107,14 @@ else {
 
 });
 
+const resetKeyBtn = document.getElementById("resetKey");
+if (resetKeyBtn) {
+  resetKeyBtn.addEventListener("click", () => {
+    sessionStorage.removeItem("key");
+    alert("Clé API supprimée. Rechargez la page pour en entrer une nouvelle.");
+    location.reload();
+  });
+}
 
 getKey();
 
