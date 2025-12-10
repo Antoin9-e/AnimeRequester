@@ -6,6 +6,9 @@ export async function afficherResultat(result) {
   let resultDiv = document.getElementById("result");
   resultDiv.classList.remove("hidden");
 
+  // Map pour tracker les URLs déjà affichées (évite les doublons)
+  const displayedUrls = new Map();
+
   // Centrage
   const isSingle = Array.isArray(result?.data) && result.data.length === 1;
   const isTwo = Array.isArray(result?.data) && result.data.length === 2;
@@ -20,6 +23,8 @@ export async function afficherResultat(result) {
     // Restaure la grille normale
     resultDiv.classList.add("grid", "grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3");
   }
+
+  let displayIndex = 0;
 
   for (const [i, anime] of result.data.entries()) {
     const conteneur = document.createElement("div");
@@ -63,11 +68,9 @@ export async function afficherResultat(result) {
         expanded = !expanded;
         if (expanded) {
           synoContent.textContent = fullSynopsis;
-          synoEllipsis.textContent = "";
           btnToggle.textContent = "Voir moins";
         } else {
           synoContent.textContent = firstSentenceText;
-          synoEllipsis.textContent = "...";
           btnToggle.textContent = "Voir plus";
         }
       });
@@ -103,7 +106,20 @@ export async function afficherResultat(result) {
     // Mise à jour asynchrone quand le lien réel est prêt (ne bloque pas l'affichage)
     buildWatchLink(anime)
       .then((result) => {
-        if (result.url) btnVoir.href = result.url;
+        if (result.url) {
+          // Vérifie si cette URL a déjà été affichée
+          const normalizedUrl = normalizeUrl(result.url);
+          if (displayedUrls.has(normalizedUrl)) {
+            // URL déjà affichée, on supprime ce conteneur
+            console.log(`Doublon détecté pour "${anime.title}" - URL: ${result.url}`);
+            conteneur.remove();
+            return;
+          }
+          
+          // Enregistre cette URL comme affichée
+          displayedUrls.set(normalizedUrl, anime.title);
+          btnVoir.href = result.url;
+        }
         
         // Met à jour le nombre d'épisodes si disponible depuis le scraping
         if (result.episodes !== null && result.episodes !== undefined) {
@@ -161,8 +177,22 @@ export async function afficherResultat(result) {
     setTimeout(() => {
       conteneur.classList.remove("opacity-0", "translate-y-5");
       conteneur.classList.add("opacity-100", "translate-y-0");
-    }, i * 150);
+    }, displayIndex * 150);
+    
+    displayIndex++;
   };
+}
+
+// Normalise une URL pour la comparaison (enlève le protocole et les paramètres)
+function normalizeUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    // Retourne le host + pathname sans protocole ni query params
+    return urlObj.host + urlObj.pathname;
+  } catch {
+    // Si l'URL est invalide, retourne telle quelle
+    return url;
+  }
 }
 
 
@@ -303,7 +333,7 @@ export function switchModeCss(){
   }
 }
 
-// Extrait la première phrase d’un texte
+// Extrait la première phrase d'un texte
 function getFirstSentence(text) {
   const t = String(text || "").trim();
 
